@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang en>
+<head>
+  <meta charset="utf-8" />
+  <title>Babylon.js Windmill FPS Scene</title>
+  <style>
+    html, body { overflow: hidden; width: 100%; height: 100%; margin: 0; padding: 0; }
+    canvas { width: 100%; height: 100%; touch-action: none; }
+  </style>
+  <script src="https://cdn.babylonjs.com/babylon.js"></script>
+  <script src="https://cdn.babylonjs.com/loaders/babylon.glTF2FileLoader.min.js"></script>
+</head>
+<body>
+<canvas id="renderCanvas"></canvas>
+<script>
+  const canvas = document.getElementById("renderCanvas");
+  const engine = new BABYLON.Engine(canvas, true);
+
+  const createScene = async () => {
+    const scene = new BABYLON.Scene(engine);
+    scene.collisionsEnabled = true;
+    scene.gravity = new BABYLON.Vector3(0, -0.2, 0);
+
+    const camera = new BABYLON.UniversalCamera("FPS_Camera", new BABYLON.Vector3(0, 2, -10), scene);
+    camera.attachControl(canvas, true);
+    camera.applyGravity = true;
+    camera.checkCollisions = true;
+    camera.ellipsoid = new BABYLON.Vector3(0.5, 1, 0.5);
+    camera.speed = 0.1;
+    camera.angularSensibility = 3000
+    
+    ;
+    camera.keysUp.push(87); camera.keysDown.push(83);
+    camera.keysLeft.push(65); camera.keysRight.push(68);
+
+    const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+    light.intensity = 0.8;
+
+    // Load from local assets folder
+    const result = await BABYLON.SceneLoader.ImportMeshAsync(null, "assets/", "scene_test_windmill.glb", scene);
+
+    result.meshes.forEach(mesh => {
+      mesh.checkCollisions = true;
+    });
+
+    return scene;
+  };
+
+  createScene().then(scene => {
+    engine.runRenderLoop(() => scene.render());
+    window.addEventListener("resize", () => engine.resize());
+  });
+</script>
+</body>
+</html>
